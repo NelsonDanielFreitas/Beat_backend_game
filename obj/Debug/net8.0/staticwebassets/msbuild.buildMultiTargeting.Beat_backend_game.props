@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Beat_backend_game.props" />
+</Project>
