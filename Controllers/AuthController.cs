@@ -43,5 +43,29 @@ namespace Beat_backend_game.Controllers
                 RefreshToken = refreshToken
             });
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest1 request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data");
+            }
+
+            var user = await _userService.ValidateUserAsync(request.Username, request.Password);
+            if (user == null)
+            {
+                return Unauthorized("Invalid username or password");
+            }
+
+            var accessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
+            var refreshToken = user.RefreshToken;
+
+            return Ok(new
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            });
+        }
     }
 }

@@ -21,5 +21,6 @@ namespace Beat_backend_game.Models
         // Propriedades para Refresh Token e Expiração
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenExpiry { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

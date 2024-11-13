@@ -31,6 +31,7 @@ namespace Beat_backend_game.Services
                 Username = username,
                 Email = email,
                 PasswordHash = passwordHash,
+                IsAdmin = true,
             };
 
             // Gera o Refresh Token
@@ -44,5 +45,25 @@ namespace Beat_backend_game.Services
 
             return (user, refreshToken);
         }
+
+        public async Task<User> ValidateUserAsync(string username, string password)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Username == username);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                return null;
+            }
+
+            // Atualiza o refresh token se ele estiver expirado
+            if (user.RefreshTokenExpiry < DateTime.UtcNow)
+            {
+                user.RefreshToken = _jwtTokenService.GenerateRefreshToken();
+                user.RefreshTokenExpiry = _jwtTokenService.GetRefreshTokenExpiry();
+                await _context.SaveChangesAsync();
+            }
+
+            return user;
+        }
+
     }
 }
