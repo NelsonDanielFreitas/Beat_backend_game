@@ -1,4 +1,5 @@
 ﻿using Beat_backend_game.DataAnnotation;
+using Beat_backend_game.Models;
 using Beat_backend_game.Services;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -40,32 +41,66 @@ namespace Beat_backend_game.Controllers
             return Ok(new
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken
+                User = user
             });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest1 request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Invalid data");
-            }
+            if (!ModelState.IsValid) return BadRequest("Invalid data");
 
             var user = await _userService.ValidateUserAsync(request.Username, request.Password);
-            if (user == null)
-            {
-                return Unauthorized("Invalid username or password");
-            }
+            if (user == null) return Unauthorized("Invalid username or password");
 
             var accessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
-            var refreshToken = user.RefreshToken;
+            var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
-            return Ok(new
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = _jwtTokenService.GetRefreshTokenExpiry();
+            await _userService.UpdateUserAsync(user);
+
+            var UserSend = new User
             {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            });
+                Username = user.Username,
+                Email = user.Email,
+                IsAdmin = user.IsAdmin
+            };
+
+            return Ok(new { AccessToken = accessToken, User = UserSend });
+        }
+
+        [HttpPost("validate-refresh-token")]
+        public async Task<IActionResult> ValidateRefreshToken([FromBody] TokenRefreshRequest request)
+        {
+            var user = await _userService.GetUserByRefreshTokenAsync(request.RefreshToken);
+            if (user == null || user.RefreshTokenExpiry < DateTime.UtcNow)
+            {
+                return Unauthorized("Invalid or expired refresh token");
+            }
+
+            return Ok("Refresh token is valid");
+        }
+
+        [HttpPost("verify-access-token")]
+        public async Task<IActionResult> VerifyAccessToken([FromBody] TokenVerificationRequest request)
+        {
+            var isAccessTokenValid = _jwtTokenService.ValidateAccessToken(request.AccessToken);
+            if (isAccessTokenValid)
+            {
+                return Ok("Access token is valid");
+            }
+
+            // If the access token is not valid, validate the refresh token
+            var user = await _userService.GetUserByRefreshTokenAsync(request.RefreshToken);
+            if (user == null || user.RefreshTokenExpiry < DateTime.UtcNow)
+            {
+                return Unauthorized("Invalid or expired refresh token");
+            }
+
+            // Generate a new access token if the refresh token is valid
+            var newAccessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
+            return Ok(new { AccessToken = newAccessToken });
         }
     }
 }

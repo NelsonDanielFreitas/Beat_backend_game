@@ -32,6 +32,38 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "Beat_backend_game.Controllers.AuthController",
+    "Method": "ValidateRefreshToken",
+    "RelativePath": "api/Auth/validate-refresh-token",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Beat_backend_game.DataAnnotation.TokenRefreshRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Beat_backend_game.Controllers.AuthController",
+    "Method": "VerifyAccessToken",
+    "RelativePath": "api/Auth/verify-access-token",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Beat_backend_game.DataAnnotation.TokenVerificationRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Beat_backend_game.Controllers.WeatherForecastController",
     "Method": "Get",
     "RelativePath": "WeatherForecast",

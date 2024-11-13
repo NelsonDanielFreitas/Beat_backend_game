@@ -38,12 +38,17 @@ namespace Beat_backend_game.Services
             var refreshToken = _jwtTokenService.GenerateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiry = _jwtTokenService.GetRefreshTokenExpiry();
-
+            var userSend = new User
+            {
+                Username = username,
+                Email = email,
+                IsAdmin = true,
+            };
             // Salva o usuário no banco de dados
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return (user, refreshToken);
+            return (userSend, refreshToken);
         }
 
         public async Task<User> ValidateUserAsync(string username, string password)
@@ -63,6 +68,17 @@ namespace Beat_backend_game.Services
             }
 
             return user;
+        }
+
+        public async Task<User> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
 
     }

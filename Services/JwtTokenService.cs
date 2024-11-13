@@ -48,5 +48,30 @@ namespace Beat_backend_game.Services
         {
             return DateTime.UtcNow.AddDays(int.Parse(_configuration["JwtSettings:RefreshTokenExpiryDays"]));
         }
+
+        public bool ValidateAccessToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
+            try
+            {
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = _configuration["JwtSettings:Issuer"],
+                    ValidAudience = _configuration["JwtSettings:Audience"],
+                    ValidateLifetime = true
+                }, out SecurityToken validatedToken);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

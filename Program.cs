@@ -37,6 +37,18 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]))
     };
 });
+
+// CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("OpenCorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -47,7 +59,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("OpenCorsPolicy");
 app.UseAuthorization();
 
 app.MapControllers();
