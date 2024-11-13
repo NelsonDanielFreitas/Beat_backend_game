@@ -14,7 +14,7 @@ namespace Beat_backend_game.Services
             _configuration = configuration;
         }
 
-        public string GenerateAccessToken(string userId, string username)
+        public string GenerateAccessToken(string userId, string username, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
@@ -22,9 +22,10 @@ namespace Beat_backend_game.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                new Claim(ClaimTypes.NameIdentifier, userId),
-                new Claim(ClaimTypes.Name, username)
-            }),
+                    new Claim(ClaimTypes.NameIdentifier, userId),
+                    new Claim(ClaimTypes.Name, username),
+                    new Claim(ClaimTypes.Role, role)  // Adiciona a claim de role
+                }),
                 Expires = DateTime.UtcNow.AddMinutes(int.Parse(_configuration["JwtSettings:AccessTokenExpiryMinutes"])),
                 Issuer = _configuration["JwtSettings:Issuer"],
                 Audience = _configuration["JwtSettings:Audience"],

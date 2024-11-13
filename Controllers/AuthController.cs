@@ -1,6 +1,7 @@
 ﻿using Beat_backend_game.DataAnnotation;
 using Beat_backend_game.Models;
 using Beat_backend_game.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ namespace Beat_backend_game.Controllers
         }
 
         [HttpPost("register")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest1 request)
         {
             if (!ModelState.IsValid)
@@ -34,9 +36,9 @@ namespace Beat_backend_game.Controllers
             {
                 return BadRequest("Username or email already exists");
             }
-
+            string role = user.IsAdmin ? "Admin" : "User";
             // Gera o Access Token
-            var accessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
+            var accessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username, role);
 
             return Ok(new
             {
@@ -52,8 +54,8 @@ namespace Beat_backend_game.Controllers
 
             var user = await _userService.ValidateUserAsync(request.Username, request.Password);
             if (user == null) return Unauthorized("Invalid username or password");
-
-            var accessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
+            string role = user.IsAdmin ? "Admin" : "User";
+            var accessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username, role);
             var refreshToken = _jwtTokenService.GenerateRefreshToken();
 
             user.RefreshToken = refreshToken;
@@ -97,9 +99,9 @@ namespace Beat_backend_game.Controllers
             {
                 return Unauthorized("Invalid or expired refresh token");
             }
-
+            string role = user.IsAdmin ? "Admin" : "User";
             // Generate a new access token if the refresh token is valid
-            var newAccessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username);
+            var newAccessToken = _jwtTokenService.GenerateAccessToken(user.Id.ToString(), user.Username, role);
             return Ok(new { AccessToken = newAccessToken });
         }
     }
