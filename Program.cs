@@ -45,7 +45,9 @@ builder.Services.AddSwaggerGen(options =>
 // Configurando o DbContext e o serviço Jwt
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<CategoryService>();
 builder.Services.AddSingleton<JwtTokenService>();
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
