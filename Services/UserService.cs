@@ -81,5 +81,9 @@ namespace Beat_backend_game.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<User> GetUserByIdAsync(string userId)
+        {
+            return await _context.Users.SingleOrDefaultAsync(u => u.Id.ToString() == userId);
+        }
     }
 }

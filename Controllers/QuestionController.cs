@@ -104,7 +104,35 @@ namespace Beat_backend_game.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateQuestion([FromBody] QuestionRequest request)
         {
-            return Ok(new { Message = "Deu" });
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                // Atualiza a pergunta principal
+                var perguntaAtualizada = new Question
+                {
+                    Id = request.Id,
+                    TextoPergunta = request.TextoPergunta,
+                    TempoLimite = request.TempoLimite,
+                    Categoria = request.Categoria,
+                    NivelDificuldade = request.NivelDificuldade,
+                    DataUpdate = DateTime.Now,
+                    TipoPergunta = request.TipoPergunta
+                };
+
+                // Chama o service para atualizar a pergunta
+                var result = await _questionService.UpdateQuestionAsync(perguntaAtualizada, request);
+
+                if (!result)
+                    return NotFound(new { message = $"Pergunta com ID {request.Id} não encontrada." });
+
+                return Ok(new { Message = "Pergunta atualizada com sucesso." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = $"Erro ao atualizar pergunta: {ex.Message}" });
+            }
         }
     }
 }
