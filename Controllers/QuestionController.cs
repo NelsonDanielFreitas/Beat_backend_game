@@ -81,6 +81,16 @@ namespace Beat_backend_game.Controllers
             });
         }
 
+        [HttpGet("GetAllQuestionCategory/{category}")]
+        public async Task<IActionResult> GetAllQuestionCategory(string category)
+        {
+            var question = _questionService.GetAllQuestionCategoryAsync(category);
+            return Ok(new
+            {
+                Questions = question
+            });
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteQuestion(int id)

@@ -100,6 +100,61 @@ namespace Beat_backend_game.Services
         }
 
 
+        public async Task<List<QuestionDto>> GetAllQuestionCategoryAsync(string categoria)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(categoria))
+                {
+                    throw new ArgumentException("A categoria não pode estar vazia.");
+                }
+
+                var questions = await _context.Questions
+                    .Where(q => q.Categoria == categoria) 
+                    .Include(q => q.VerdadeiroFalsos)
+                    .Include(q => q.EscolhaMultiplas)
+                    .Include(q => q.OrdemPalavras)
+                    .Select(q => new QuestionDto
+                    {
+                        Id = q.Id,
+                        TextoPergunta = q.TextoPergunta,
+                        TempoLimite = q.TempoLimite,
+                        Categoria = q.Categoria,
+                        NivelDificuldade = q.NivelDificuldade,
+                        DataCriacao = q.DataCriacao,
+                        DataUpdate = q.DataUpdate,
+                        TipoPergunta = q.TipoPergunta,
+                        VerdadeiroFalsos = q.VerdadeiroFalsos
+                            .Select(vf => new VerdadeiroFalsoDto
+                            {
+                                Id = vf.Id,
+                                Correta = vf.Correta
+                            }).ToList(),
+                        EscolhaMultiplas = q.EscolhaMultiplas
+                            .Select(em => new EscolhaMultiplaDto
+                            {
+                                Id = em.Id,
+                                TextoOpcao = em.TextoOpcao,
+                                Correta = em.Correta
+                            }).ToList(),
+                        OrdemPalavras = q.OrdemPalavras
+                            .Select(op => new OrdemPalavrasDTO
+                            {
+                                Id = op.Id,
+                                Palavra = op.Palavra,
+                                Posicao = op.Posicao
+                            }).ToList()
+                    }).ToListAsync();
+
+                return questions;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao buscar perguntas por categoria", ex);
+            }
+        }
+
+
         public async Task<bool> DeleteQuestionAsync(int questionId)
         {
             // Busca a pergunta pelo ID
