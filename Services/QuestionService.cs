@@ -23,13 +23,13 @@ namespace Beat_backend_game.Services
 
             switch (tipo)
             {
-                case "Verdadeiro/Falso":
+                case "True/False":
                     var verdadeiroFalso = (VerdadeiroFalso)detalhes;
                     verdadeiroFalso.IdPergunta = pergunta.Id;
                     _context.VerdadeiroFalsos.Add(verdadeiroFalso);
                     break;
 
-                case "Escolha Múltipla":
+                case "Multiple Choice":
                     var opcoes = (IEnumerable<EscolhaMultipla>)detalhes;
                     foreach (var opcao in opcoes)
                     {
@@ -38,7 +38,7 @@ namespace Beat_backend_game.Services
                     }
                     break;
 
-                case "Ordem de Palavras":
+                case "Word order":
                     var palavras = (IEnumerable<OrdemPalavras>)detalhes;
                     foreach (var palavra in palavras)
                     {
@@ -205,7 +205,7 @@ namespace Beat_backend_game.Services
             {
                 switch (perguntaAtualizada.TipoPergunta)
                 {
-                    case "Verdadeiro/Falso":
+                    case "True/False":
                         var vfExistente = perguntaExistente.VerdadeiroFalsos.FirstOrDefault();
                         if (vfExistente != null)
                         {
@@ -213,7 +213,7 @@ namespace Beat_backend_game.Services
                         }
                         break;
 
-                    case "Escolha Múltipla":
+                    case "Multiple Choice":
                         if (request.Opcoes != null)
                         {
                             var novasOpcoes = request.Opcoes.ToDictionary(o => o.TextoOpcao);
@@ -247,7 +247,7 @@ namespace Beat_backend_game.Services
                         }
                         break;
 
-                    case "Ordem de Palavras":
+                    case "Word order":
                         if (request.Palavras != null)
                         {
                             var palavrasAtualizadas = request.Palavras

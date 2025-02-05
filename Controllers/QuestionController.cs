@@ -37,30 +37,30 @@ namespace Beat_backend_game.Controllers
 
             switch (request.TipoPergunta)
             {
-                case "Verdadeiro/Falso":
+                case "True/False":
                     var verdadeiroFalso = new VerdadeiroFalso
                     {
                         Correta = request.Correta ?? false
                     };
-                    await _questionService.AddQuestion(pergunta, "Verdadeiro/Falso", verdadeiroFalso);
+                    await _questionService.AddQuestion(pergunta, "True/False", verdadeiroFalso);
                     break;
 
-                case "Escolha Múltipla":
+                case "Multiple Choice":
                     var opcoes = request.Opcoes?.Select(o => new EscolhaMultipla
                     {
                         TextoOpcao = o.TextoOpcao,
                         Correta = o.Correta
                     }).ToList();
-                    await _questionService.AddQuestion(pergunta, "Escolha Múltipla", opcoes);
+                    await _questionService.AddQuestion(pergunta, "Multiple Choice", opcoes);
                     break;
 
-                case "Ordem de Palavras":
+                case "Word order":
                     var palavras = request.Palavras?.Select((palavra, index) => new OrdemPalavras
                     {
                         Palavra = palavra,
                         Posicao = index
                     }).ToList();
-                    await _questionService.AddQuestion(pergunta, "Ordem de Palavras", palavras);
+                    await _questionService.AddQuestion(pergunta, "Word order", palavras);
                     break;
 
                 default:
