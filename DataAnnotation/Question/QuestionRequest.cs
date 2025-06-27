@@ -13,7 +13,7 @@
         public bool? Correta { get; set; }  
         public List<Opcao>? Opcoes { get; set; } 
         public string[]? Palavras { get; set; }
-
+        public string? Curiosidade { get; set; }
 
         public class Opcao
         {

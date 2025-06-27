@@ -73,7 +73,59 @@ namespace Beat_backend_game.Services
                             .Select(vf => new VerdadeiroFalsoDto
                             {
                                 Id = vf.Id,
-                                Correta = vf.Correta
+                                Correta = vf.Correta,
+                                Curiosidade = vf.Curiosidade
+                            }).ToList(),
+                        EscolhaMultiplas = q.EscolhaMultiplas
+                            .Select(em => new EscolhaMultiplaDto
+                            {
+                                Id = em.Id,
+                                TextoOpcao = em.TextoOpcao,
+                                Correta = em.Correta
+                            }).ToList(),
+                        OrdemPalavras = q.OrdemPalavras
+                            .Select(op => new OrdemPalavrasDTO
+                            {
+                                Id = op.Id,
+                                Palavra = op.Palavra,
+                                Posicao = op.Posicao
+                            }).ToList()
+                    }).ToListAsync();
+
+                return questions;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro ao buscar perguntas com detalhes", ex);
+            }
+        }
+
+
+        public async Task<List<QuestionDto>> GetAllQuestionCuriosidadeAsync()
+        {
+            try
+            {
+                var questions = await _context.Questions
+                    .Where(q => q.TipoPergunta == "True/False")
+                    .Include(q => q.VerdadeiroFalsos)
+                    //.Include(q => q.EscolhaMultiplas)
+                    //.Include(q => q.OrdemPalavras)
+                    .Select(q => new QuestionDto
+                    {
+                        Id = q.Id,
+                        TextoPergunta = q.TextoPergunta,
+                        TempoLimite = q.TempoLimite,
+                        Categoria = q.Categoria,
+                        NivelDificuldade = q.NivelDificuldade,
+                        DataCriacao = q.DataCriacao,
+                        DataUpdate = q.DataUpdate,
+                        TipoPergunta = q.TipoPergunta,
+                        VerdadeiroFalsos = q.VerdadeiroFalsos
+                            .Select(vf => new VerdadeiroFalsoDto
+                            {
+                                Id = vf.Id,
+                                Correta = vf.Correta,
+                                Curiosidade = vf.Curiosidade
                             }).ToList(),
                         EscolhaMultiplas = q.EscolhaMultiplas
                             .Select(em => new EscolhaMultiplaDto
@@ -110,10 +162,11 @@ namespace Beat_backend_game.Services
                 }
 
                 var questions = await _context.Questions
-                    .Where(q => q.Categoria == categoria) 
-                    .Include(q => q.VerdadeiroFalsos)
+                    .Where(q => q.Categoria == categoria)
+                    .Where(q => q.TipoPergunta == "Multiple Choice")
+                    //.Include(q => q.VerdadeiroFalsos)
                     .Include(q => q.EscolhaMultiplas)
-                    .Include(q => q.OrdemPalavras)
+                    //.Include(q => q.OrdemPalavras)
                     .Select(q => new QuestionDto
                     {
                         Id = q.Id,
@@ -128,7 +181,8 @@ namespace Beat_backend_game.Services
                             .Select(vf => new VerdadeiroFalsoDto
                             {
                                 Id = vf.Id,
-                                Correta = vf.Correta
+                                Correta = vf.Correta,
+                                Curiosidade = vf.Curiosidade
                             }).ToList(),
                         EscolhaMultiplas = q.EscolhaMultiplas
                             .Select(em => new EscolhaMultiplaDto
@@ -210,6 +264,7 @@ namespace Beat_backend_game.Services
                         if (vfExistente != null)
                         {
                             vfExistente.Correta = request.Correta ?? false;
+                            vfExistente.Curiosidade = request.Curiosidade ?? "";
                         }
                         break;
 

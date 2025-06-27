@@ -21,6 +21,7 @@
         {
             public int Id { get; set; }
             public bool Correta { get; set; }
+            public string Curiosidade { get; set; }
         }
 
         public class EscolhaMultiplaDto

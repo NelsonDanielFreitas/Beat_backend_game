@@ -13,5 +13,7 @@ namespace Beat_backend_game.Models
         public Question Pergunta { get; set; }
 
         public bool Correta { get; set; }
+
+        public string? Curiosidade { get; set; }
     }
 }

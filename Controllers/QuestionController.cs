@@ -40,7 +40,9 @@ namespace Beat_backend_game.Controllers
                 case "True/False":
                     var verdadeiroFalso = new VerdadeiroFalso
                     {
-                        Correta = request.Correta ?? false
+                        Correta = request.Correta ?? false,
+                        Curiosidade = request.Curiosidade
+                        
                     };
                     await _questionService.AddQuestion(pergunta, "True/False", verdadeiroFalso);
                     break;
@@ -85,6 +87,16 @@ namespace Beat_backend_game.Controllers
         public async Task<IActionResult> GetAllQuestionCategory(string category)
         {
             var question = _questionService.GetAllQuestionCategoryAsync(category);
+            return Ok(new
+            {
+                Questions = question
+            });
+        }
+
+        [HttpGet("GetAllQuestionCuriosidade")]
+        public async Task<IActionResult> GetAllQuestionCuriosidade()
+        {
+            var question = _questionService.GetAllQuestionCuriosidadeAsync();
             return Ok(new
             {
                 Questions = question
